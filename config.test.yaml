@@ -1,0 +1,5 @@
+database:
+  connectionString: postgresql://postgres:password@localhost:5432
+  params:
+    dbname: toolbelt_test
+    sslmode: disable
