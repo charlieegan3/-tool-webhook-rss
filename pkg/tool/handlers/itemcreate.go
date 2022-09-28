@@ -41,6 +41,16 @@ func BuildItemCreateHandler(db *sql.DB) func(http.ResponseWriter, *http.Request)
 				return
 			}
 
+			if len(item.Title) > 500 {
+				writer.WriteHeader(http.StatusBadRequest)
+				return
+			}
+
+			if len(item.Body) > 100000 {
+				writer.WriteHeader(http.StatusBadRequest)
+				return
+			}
+
 			records = append(records, goqu.Record{
 				"feed":  feed,
 				"title": item.Title,
