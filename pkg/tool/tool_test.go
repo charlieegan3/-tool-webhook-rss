@@ -2,21 +2,19 @@ package tool
 
 import (
 	"bytes"
+	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
-	"net/url"
-	"os"
-	"testing"
-	"time"
-
 	"github.com/charlieegan3/toolbelt/pkg/database/databasetest"
 	"github.com/charlieegan3/toolbelt/pkg/tool"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
+	"io"
+	"net/http"
+	"net/url"
+	"testing"
 
 	"github.com/charlieegan3/tool-webhook-rss/pkg/apis"
 )
@@ -54,13 +52,11 @@ func (s *ToolWebhookRSSSuite) TestHTTP() {
 	err := tb.AddTool(webhookRSSTool)
 	require.NoError(t, err)
 
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	// start the toolbelt server to test the tool's http functions
-	c := tb.StartServer("0.0.0.0", "9032")
-	require.NoError(t, err)
-	defer func() {
-		c <- os.Interrupt
-		err = tb.StopServer(5 * time.Second)
-		require.NoError(t, err)
+	go func() {
+		tb.RunServer(ctx, "0.0.0.0", "9032")
 	}()
 
 	// first, send some items to some feeds

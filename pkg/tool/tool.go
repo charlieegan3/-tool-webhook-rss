@@ -64,3 +64,7 @@ func (d *WebhookRSS) HTTPAttach(router *mux.Router) error {
 
 	return nil
 }
+
+func (d *WebhookRSS) Jobs() []apis.Job {
+	return []apis.Job{}
+}
