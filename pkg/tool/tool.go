@@ -19,6 +19,7 @@ type WebhookRSS struct {
 	loadedJobs []apis.Job
 
 	JobsDeadManEndpoint string
+	JobsDeadManSchedule string
 }
 
 func (d *WebhookRSS) Name() string {
@@ -75,5 +76,10 @@ func (d *WebhookRSS) Jobs() []apis.Job {
 		return d.loadedJobs
 	}
 
-	return []apis.Job{&jobs.DeadMan{Endpoint: d.JobsDeadManEndpoint}}
+	return []apis.Job{
+		&jobs.DeadMan{
+			Endpoint:         d.JobsDeadManEndpoint,
+			ScheduleOverride: d.JobsDeadManSchedule,
+		},
+	}
 }
