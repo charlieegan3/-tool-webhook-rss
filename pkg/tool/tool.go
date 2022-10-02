@@ -21,6 +21,7 @@ type WebhookRSS struct {
 	JobsDeadManEndpoint string
 	JobsDeadManSchedule string
 
+	JobsCheckSchedule      string
 	JobsCheckPushoverToken string
 	JobsCheckPushoverApp   string
 }
@@ -85,8 +86,9 @@ func (d *WebhookRSS) Jobs() []apis.Job {
 			ScheduleOverride: d.JobsDeadManSchedule,
 		},
 		&jobs.Check{
-			PushoverApp:   d.JobsCheckPushoverApp,
-			PushoverToken: d.JobsCheckPushoverToken,
+			ScheduleOverride: d.JobsCheckSchedule,
+			PushoverApp:      d.JobsCheckPushoverApp,
+			PushoverToken:    d.JobsCheckPushoverToken,
 		},
 	}
 }
