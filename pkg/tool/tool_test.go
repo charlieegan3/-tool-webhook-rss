@@ -6,17 +6,21 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
+	"net/url"
+	"testing"
+	"time"
+
+	toolbeltAPIs "github.com/charlieegan3/toolbelt/pkg/apis"
 	"github.com/charlieegan3/toolbelt/pkg/database/databasetest"
 	"github.com/charlieegan3/toolbelt/pkg/tool"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
-	"io"
-	"net/http"
-	"net/url"
-	"testing"
 
 	"github.com/charlieegan3/tool-webhook-rss/pkg/apis"
+	"github.com/charlieegan3/tool-webhook-rss/pkg/tool/jobs"
 )
 
 func TestToolWebhookRSSSuite(t *testing.T) {
@@ -26,7 +30,7 @@ func TestToolWebhookRSSSuite(t *testing.T) {
 
 	s.Setup(t)
 
-	s.AddDependentSuite(ToolWebhookRSSSuite{DB: s.DB})
+	s.AddDependentSuite(&ToolWebhookRSSSuite{DB: s.DB})
 
 	s.Run(t)
 }
@@ -36,8 +40,55 @@ type ToolWebhookRSSSuite struct {
 	DB *sql.DB
 }
 
-func (s ToolWebhookRSSSuite) Run(t *testing.T) {
-	suite.Run(t, &s)
+func (s *ToolWebhookRSSSuite) Run(t *testing.T) {
+	suite.Run(t, s)
+}
+
+func (s *ToolWebhookRSSSuite) TestJobsDeadMan() {
+	t := s.T()
+
+	tb := tool.NewBelt()
+
+	tb.SetDatabase(s.DB)
+
+	toolWebhookRSS := &WebhookRSS{
+		loadedJobs: []toolbeltAPIs.Job{
+			&jobs.DeadMan{
+				ScheduleOverride: "* * * * * *",
+				Endpoint:         "http://localhost:9032/webhook-rss/feeds/deadman/items",
+			},
+		},
+	}
+
+	err := tb.AddTool(toolWebhookRSS)
+	require.NoError(t, err)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	go tb.RunServer(ctx, "0.0.0.0", "9032")
+	go tb.RunJobs(ctx)
+
+	// allow the jobs to run and create some entries
+	time.Sleep(2 * time.Second)
+
+	req := &http.Request{
+		Method: "GET",
+		URL: &url.URL{
+			Scheme: "http",
+			Host:   "localhost:9032",
+			Path:   "/webhook-rss/feeds/deadman.rss",
+		},
+	}
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	require.NoError(t, err)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+
+	body, err := io.ReadAll(resp.Body)
+	require.NoError(t, err)
+
+	assert.Contains(t, string(body), "Dead Man Pulse")
 }
 
 func (s *ToolWebhookRSSSuite) TestHTTP() {

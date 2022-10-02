@@ -5,6 +5,7 @@ import (
 	"embed"
 	"fmt"
 	"github.com/charlieegan3/tool-webhook-rss/pkg/tool/handlers"
+	"github.com/charlieegan3/tool-webhook-rss/pkg/tool/jobs"
 	"github.com/charlieegan3/toolbelt/pkg/apis"
 	"github.com/gorilla/mux"
 )
@@ -14,7 +15,10 @@ var webhookRSSToolMigrations embed.FS
 
 // WebhookRSS is an example tool which demonstrates the use of the database feature
 type WebhookRSS struct {
-	db *sql.DB
+	db         *sql.DB
+	loadedJobs []apis.Job
+
+	JobsDeadManEndpoint string
 }
 
 func (d *WebhookRSS) Name() string {
@@ -25,6 +29,7 @@ func (d *WebhookRSS) FeatureSet() apis.FeatureSet {
 	return apis.FeatureSet{
 		HTTP:     true,
 		Database: true,
+		Jobs:     true,
 	}
 }
 
@@ -66,5 +71,9 @@ func (d *WebhookRSS) HTTPAttach(router *mux.Router) error {
 }
 
 func (d *WebhookRSS) Jobs() []apis.Job {
-	return []apis.Job{}
+	if len(d.loadedJobs) > 0 {
+		return d.loadedJobs
+	}
+
+	return []apis.Job{&jobs.DeadMan{Endpoint: d.JobsDeadManEndpoint}}
 }
