@@ -3,7 +3,7 @@ module github.com/charlieegan3/tool-webhook-rss
 go 1.19
 
 require (
-	github.com/charlieegan3/toolbelt v0.0.0-20221002142243-f9268beef750
+	github.com/charlieegan3/toolbelt v0.0.0-20221002205018-881a01448990
 	github.com/doug-martin/goqu/v9 v9.18.0
 	github.com/gorilla/feeds v1.1.1
 	github.com/gorilla/mux v1.8.0
