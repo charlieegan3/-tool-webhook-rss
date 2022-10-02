@@ -86,6 +86,7 @@ func (d *WebhookRSS) Jobs() []apis.Job {
 			ScheduleOverride: d.JobsDeadManSchedule,
 		},
 		&jobs.Check{
+			DB:               d.db,
 			ScheduleOverride: d.JobsCheckSchedule,
 			PushoverApp:      d.JobsCheckPushoverApp,
 			PushoverToken:    d.JobsCheckPushoverToken,
