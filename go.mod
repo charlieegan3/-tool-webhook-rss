@@ -5,7 +5,9 @@ go 1.19
 require (
 	github.com/charlieegan3/toolbelt v0.0.0-20221002142243-f9268beef750
 	github.com/doug-martin/goqu/v9 v9.18.0
+	github.com/gorilla/feeds v1.1.1
 	github.com/gorilla/mux v1.8.0
+	github.com/gregdel/pushover v1.1.0
 	github.com/stretchr/testify v1.8.0
 )
 
@@ -13,8 +15,6 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fsnotify/fsnotify v1.5.4 // indirect
 	github.com/golang-migrate/migrate/v4 v4.15.2 // indirect
-	github.com/gorilla/feeds v1.1.1 // indirect
-	github.com/gregdel/pushover v1.1.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect

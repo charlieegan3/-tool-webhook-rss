@@ -24,6 +24,8 @@ type WebhookRSS struct {
 	JobsCheckSchedule      string
 	JobsCheckPushoverToken string
 	JobsCheckPushoverApp   string
+
+	JobsCleanSchedule string
 }
 
 func (d *WebhookRSS) Name() string {
@@ -90,6 +92,10 @@ func (d *WebhookRSS) Jobs() []apis.Job {
 			ScheduleOverride: d.JobsCheckSchedule,
 			PushoverApp:      d.JobsCheckPushoverApp,
 			PushoverToken:    d.JobsCheckPushoverToken,
+		},
+		&jobs.Clean{
+			DB:               d.db,
+			ScheduleOverride: d.JobsCleanSchedule,
 		},
 	}
 }
