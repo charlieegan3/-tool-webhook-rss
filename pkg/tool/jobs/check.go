@@ -34,8 +34,8 @@ func (d *Check) Run(ctx context.Context) error {
 		var err error
 		defer func() {
 			if err != nil {
-				app := pushover.New(d.PushoverToken)
-				recipient := pushover.NewRecipient(d.PushoverApp)
+				app := pushover.New(d.PushoverApp)
+				recipient := pushover.NewRecipient(d.PushoverToken)
 				message := pushover.NewMessage(err.Error())
 
 				_, sendErr := app.SendMessage(message, recipient)
