@@ -20,6 +20,9 @@ type WebhookRSS struct {
 
 	JobsDeadManEndpoint string
 	JobsDeadManSchedule string
+
+	JobsCheckPushoverToken string
+	JobsCheckPushoverApp   string
 }
 
 func (d *WebhookRSS) Name() string {
@@ -80,6 +83,10 @@ func (d *WebhookRSS) Jobs() []apis.Job {
 		&jobs.DeadMan{
 			Endpoint:         d.JobsDeadManEndpoint,
 			ScheduleOverride: d.JobsDeadManSchedule,
+		},
+		&jobs.Check{
+			PushoverApp:   d.JobsCheckPushoverApp,
+			PushoverToken: d.JobsCheckPushoverToken,
 		},
 	}
 }
