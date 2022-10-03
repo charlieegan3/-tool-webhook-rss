@@ -3,7 +3,7 @@ module github.com/charlieegan3/tool-webhook-rss
 go 1.19
 
 require (
-	github.com/charlieegan3/toolbelt v0.0.0-20221002205018-881a01448990
+	github.com/charlieegan3/toolbelt v0.0.0-20221003070854-1b918dbbc9b5
 	github.com/doug-martin/goqu/v9 v9.18.0
 	github.com/gorilla/feeds v1.1.1
 	github.com/gorilla/mux v1.8.0
@@ -26,6 +26,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/robfig/cron v1.2.0 // indirect
+	github.com/sirupsen/logrus v1.8.1 // indirect
 	github.com/spf13/afero v1.8.2 // indirect
 	github.com/spf13/cast v1.5.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
