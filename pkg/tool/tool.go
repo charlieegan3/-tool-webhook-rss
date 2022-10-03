@@ -89,17 +89,17 @@ func (d *WebhookRSS) Jobs() ([]apis.Job, error) {
 	}
 
 	// load deadman check config
-	path = "jobs.check.schedule"
+	path = "jobs.deadman-check.schedule"
 	deadmanCheckSchedule, ok := d.config.Path(path).Data().(string)
 	if !ok {
 		return j, fmt.Errorf("missing required config path: %s", path)
 	}
-	path = "jobs.check.pushover_token"
+	path = "jobs.deadman-check.pushover_token"
 	deadmanCheckPushoverToken, ok := d.config.Path(path).Data().(string)
 	if !ok {
 		return j, fmt.Errorf("missing required config path: %s", path)
 	}
-	path = "jobs.check.pushover_app"
+	path = "jobs.deadman-check.pushover_app"
 	deadmanCheckPushoverApp, ok := d.config.Path(path).Data().(string)
 	if !ok {
 		return j, fmt.Errorf("missing required config path: %s", path)
@@ -108,6 +108,18 @@ func (d *WebhookRSS) Jobs() ([]apis.Job, error) {
 	// load clean config
 	path = "jobs.clean.schedule"
 	cleanSchedule, ok := d.config.Path(path).Data().(string)
+	if !ok {
+		return j, fmt.Errorf("missing required config path: %s", path)
+	}
+
+	// load clean check config
+	path = "jobs.clean-check.schedule"
+	cleanCheckSchedule, ok := d.config.Path(path).Data().(string)
+	if !ok {
+		return j, fmt.Errorf("missing required config path: %s", path)
+	}
+	path = "jobs.clean-check.endpoint"
+	cleanCheckEndpoint, ok := d.config.Path(path).Data().(string)
 	if !ok {
 		return j, fmt.Errorf("missing required config path: %s", path)
 	}
@@ -126,6 +138,11 @@ func (d *WebhookRSS) Jobs() ([]apis.Job, error) {
 		&jobs.Clean{
 			DB:               d.db,
 			ScheduleOverride: cleanSchedule,
+		},
+		&jobs.CleanCheck{
+			DB:               d.db,
+			ScheduleOverride: cleanCheckSchedule,
+			Endpoint:         cleanCheckEndpoint,
 		},
 	}, nil
 }

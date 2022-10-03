@@ -48,9 +48,13 @@ func (d *DeadMan) Run(ctx context.Context) error {
 
 		req.Header.Add("Content-Type", "application/json; charset=utf-8")
 
-		_, err = client.Do(req)
+		resp, err := client.Do(req)
 		if err != nil {
 			errCh <- fmt.Errorf("failed to send request for dead man item: %s", err)
+			return
+		}
+		if resp.StatusCode != http.StatusOK {
+			errCh <- fmt.Errorf("failed to send request: non 200OK response")
 			return
 		}
 
