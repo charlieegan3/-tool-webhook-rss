@@ -10,9 +10,9 @@ import (
 	"time"
 )
 
-// Check will validate functionality of the tool by checking the deadman feed.
+// DeadmanCheck will validate functionality of the tool by checking the deadman feed.
 // This job will notify using pushover if the deadman feed is not working.
-type Check struct {
+type DeadmanCheck struct {
 	ScheduleOverride string
 
 	DB            *sql.DB
@@ -20,11 +20,11 @@ type Check struct {
 	PushoverApp   string
 }
 
-func (d *Check) Name() string {
-	return "check"
+func (d *DeadmanCheck) Name() string {
+	return "deadman-check"
 }
 
-func (d *Check) Run(ctx context.Context) error {
+func (d *DeadmanCheck) Run(ctx context.Context) error {
 	doneCh := make(chan bool)
 	errCh := make(chan error)
 
@@ -92,11 +92,11 @@ func (d *Check) Run(ctx context.Context) error {
 	}
 }
 
-func (d *Check) Timeout() time.Duration {
+func (d *DeadmanCheck) Timeout() time.Duration {
 	return 15 * time.Second
 }
 
-func (d *Check) Schedule() string {
+func (d *DeadmanCheck) Schedule() string {
 	if d.ScheduleOverride != "" {
 		return d.ScheduleOverride
 	}

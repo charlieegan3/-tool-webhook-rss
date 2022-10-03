@@ -12,7 +12,6 @@ import (
 	"testing"
 	"time"
 
-	toolbeltAPIs "github.com/charlieegan3/toolbelt/pkg/apis"
 	"github.com/charlieegan3/toolbelt/pkg/database/databasetest"
 	"github.com/charlieegan3/toolbelt/pkg/tool"
 	"github.com/stretchr/testify/assert"
@@ -20,8 +19,26 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/charlieegan3/tool-webhook-rss/pkg/apis"
-	"github.com/charlieegan3/tool-webhook-rss/pkg/tool/jobs"
 )
+
+var toolTestConfig = map[string]interface{}{
+	"webhook-rss": map[string]interface{}{
+		"jobs": map[string]interface{}{
+			"deadman": map[string]interface{}{
+				"schedule": "* * * * * *",
+				"endpoint": "http://localhost:9032/webhook-rss/feeds/deadman/items",
+			},
+			"check": map[string]interface{}{
+				"schedule":       "* * * * * *",
+				"pushover_token": "abc123",
+				"pushover_app":   "abc123",
+			},
+			"clean": map[string]interface{}{
+				"schedule": "* * * * * *",
+			},
+		},
+	},
+}
 
 func TestToolWebhookRSSSuite(t *testing.T) {
 	s := &databasetest.DatabaseSuite{
@@ -48,17 +65,11 @@ func (s *ToolWebhookRSSSuite) TestJobsDeadMan() {
 	t := s.T()
 
 	tb := tool.NewBelt()
+	tb.SetConfig(toolTestConfig)
 
 	tb.SetDatabase(s.DB)
 
-	toolWebhookRSS := &WebhookRSS{
-		loadedJobs: []toolbeltAPIs.Job{
-			&jobs.DeadMan{
-				ScheduleOverride: "* * * * * *",
-				Endpoint:         "http://localhost:9032/webhook-rss/feeds/deadman/items",
-			},
-		},
-	}
+	toolWebhookRSS := &WebhookRSS{}
 
 	err := tb.AddTool(toolWebhookRSS)
 	require.NoError(t, err)
@@ -96,6 +107,7 @@ func (s *ToolWebhookRSSSuite) TestHTTP() {
 
 	// create a new toolbelt to test the tool
 	tb := tool.NewBelt()
+	tb.SetConfig(toolTestConfig)
 	tb.SetDatabase(s.DB)
 	webhookRSSTool := &WebhookRSS{}
 

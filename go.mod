@@ -2,8 +2,11 @@ module github.com/charlieegan3/tool-webhook-rss
 
 go 1.19
 
+//replace github.com/charlieegan3/toolbelt => /Users/charlieegan3/Code/toolbelt
+
 require (
-	github.com/charlieegan3/toolbelt v0.0.0-20221003070854-1b918dbbc9b5
+	github.com/Jeffail/gabs/v2 v2.6.1
+	github.com/charlieegan3/toolbelt v0.0.0-20221003074005-394a3439ad94
 	github.com/doug-martin/goqu/v9 v9.18.0
 	github.com/gorilla/feeds v1.1.1
 	github.com/gorilla/mux v1.8.0

@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"embed"
 	"fmt"
+	"github.com/Jeffail/gabs/v2"
 	"github.com/charlieegan3/tool-webhook-rss/pkg/tool/handlers"
 	"github.com/charlieegan3/tool-webhook-rss/pkg/tool/jobs"
 	"github.com/charlieegan3/toolbelt/pkg/apis"
@@ -15,17 +16,8 @@ var webhookRSSToolMigrations embed.FS
 
 // WebhookRSS is an example tool which demonstrates the use of the database feature
 type WebhookRSS struct {
-	db         *sql.DB
-	loadedJobs []apis.Job
-
-	JobsDeadManEndpoint string
-	JobsDeadManSchedule string
-
-	JobsCheckSchedule      string
-	JobsCheckPushoverToken string
-	JobsCheckPushoverApp   string
-
-	JobsCleanSchedule string
+	config *gabs.Container
+	db     *sql.DB
 }
 
 func (d *WebhookRSS) Name() string {
@@ -34,6 +26,7 @@ func (d *WebhookRSS) Name() string {
 
 func (d *WebhookRSS) FeatureSet() apis.FeatureSet {
 	return apis.FeatureSet{
+		Config:   true,
 		HTTP:     true,
 		Database: true,
 		Jobs:     true,
@@ -44,8 +37,9 @@ func (d *WebhookRSS) HTTPPath() string {
 	return "webhook-rss"
 }
 
-// SetConfig is a no-op for this tool
 func (d *WebhookRSS) SetConfig(config map[string]any) error {
+	d.config = gabs.Wrap(config)
+
 	return nil
 }
 
@@ -77,25 +71,61 @@ func (d *WebhookRSS) HTTPAttach(router *mux.Router) error {
 	return nil
 }
 
-func (d *WebhookRSS) Jobs() []apis.Job {
-	if len(d.loadedJobs) > 0 {
-		return d.loadedJobs
+func (d *WebhookRSS) Jobs() ([]apis.Job, error) {
+	var j []apis.Job
+	var path string
+	var ok bool
+
+	// load deadman config
+	path = "jobs.deadman.endpoint"
+	deadmanEndpoint, ok := d.config.Path(path).Data().(string)
+	if !ok {
+		return j, fmt.Errorf("missing required config path: %s", path)
+	}
+	path = "jobs.deadman.schedule"
+	deadmanSchedule, ok := d.config.Path(path).Data().(string)
+	if !ok {
+		return j, fmt.Errorf("missing required config path: %s", path)
+	}
+
+	// load deadman check config
+	path = "jobs.check.schedule"
+	deadmanCheckSchedule, ok := d.config.Path(path).Data().(string)
+	if !ok {
+		return j, fmt.Errorf("missing required config path: %s", path)
+	}
+	path = "jobs.check.pushover_token"
+	deadmanCheckPushoverToken, ok := d.config.Path(path).Data().(string)
+	if !ok {
+		return j, fmt.Errorf("missing required config path: %s", path)
+	}
+	path = "jobs.check.pushover_app"
+	deadmanCheckPushoverApp, ok := d.config.Path(path).Data().(string)
+	if !ok {
+		return j, fmt.Errorf("missing required config path: %s", path)
+	}
+
+	// load clean config
+	path = "jobs.clean.schedule"
+	cleanSchedule, ok := d.config.Path(path).Data().(string)
+	if !ok {
+		return j, fmt.Errorf("missing required config path: %s", path)
 	}
 
 	return []apis.Job{
 		&jobs.DeadMan{
-			Endpoint:         d.JobsDeadManEndpoint,
-			ScheduleOverride: d.JobsDeadManSchedule,
+			Endpoint:         deadmanEndpoint,
+			ScheduleOverride: deadmanSchedule,
 		},
-		&jobs.Check{
+		&jobs.DeadmanCheck{
 			DB:               d.db,
-			ScheduleOverride: d.JobsCheckSchedule,
-			PushoverApp:      d.JobsCheckPushoverApp,
-			PushoverToken:    d.JobsCheckPushoverToken,
+			ScheduleOverride: deadmanCheckSchedule,
+			PushoverApp:      deadmanCheckPushoverApp,
+			PushoverToken:    deadmanCheckPushoverToken,
 		},
 		&jobs.Clean{
 			DB:               d.db,
-			ScheduleOverride: d.JobsCleanSchedule,
+			ScheduleOverride: cleanSchedule,
 		},
-	}
+	}, nil
 }
