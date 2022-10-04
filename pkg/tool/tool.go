@@ -14,7 +14,8 @@ import (
 //go:embed migrations
 var webhookRSSToolMigrations embed.FS
 
-// WebhookRSS is an example tool which demonstrates the use of the database feature
+// WebhookRSS is a tool to create RSS feeds from webhooks, it has a handler to accept new items and display feeds.
+// There are also a number of jobs to keep the database clean and check that the tool is still working.
 type WebhookRSS struct {
 	config *gabs.Container
 	db     *sql.DB
