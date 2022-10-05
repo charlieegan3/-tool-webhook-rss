@@ -28,13 +28,17 @@ var toolTestConfig = map[string]interface{}{
 				"schedule": "* * * * * *",
 				"endpoint": "http://localhost:9032/webhook-rss/feeds/deadman/items",
 			},
-			"check": map[string]interface{}{
+			"deadman-check": map[string]interface{}{
 				"schedule":       "* * * * * *",
 				"pushover_token": "abc123",
 				"pushover_app":   "abc123",
 			},
 			"clean": map[string]interface{}{
 				"schedule": "* * * * * *",
+			},
+			"clean-check": map[string]interface{}{
+				"schedule": "* * * * * *",
+				"endpoint": "http://localhost:9032/webhook-rss/feeds/alerts/items",
 			},
 		},
 	},

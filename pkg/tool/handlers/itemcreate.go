@@ -73,7 +73,7 @@ func BuildItemCreateHandler(db *sql.DB) func(http.ResponseWriter, *http.Request)
 
 		ins := goquDB.Insert("webhookrss.items").Rows(records)
 
-		_, err = ins.Executor().Exec()
+		_, err := ins.Executor().Exec()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
