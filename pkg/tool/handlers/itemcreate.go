@@ -29,12 +29,17 @@ func BuildItemCreateHandler(db *sql.DB) func(http.ResponseWriter, *http.Request)
 		}
 
 		var items []toolAPIs.PayloadNewItem
-		err := json.NewDecoder(r.Body).Decode(&items)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			w.Write([]byte(err.Error()))
-
-			return
+		arrErr := json.NewDecoder(r.Body).Decode(&items)
+		if arrErr != nil {
+			// here we handle the case where a single item is sent.
+			// regrettably, the apple shortcuts app can't send arrays, so we have to handle single items here.
+			var item toolAPIs.PayloadNewItem
+			err := json.NewDecoder(r.Body).Decode(&item)
+			if err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				w.Write([]byte("failed to parse JSON data as as item array or item object"))
+			}
+			items = []toolAPIs.PayloadNewItem{item}
 		}
 
 		var records []goqu.Record
