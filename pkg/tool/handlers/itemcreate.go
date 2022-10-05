@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
 	toolAPIs "github.com/charlieegan3/tool-webhook-rss/pkg/apis"
 	"github.com/doug-martin/goqu/v9"
 	"github.com/gorilla/mux"
+	"io"
 	"net/http"
 )
 
@@ -28,16 +30,25 @@ func BuildItemCreateHandler(db *sql.DB) func(http.ResponseWriter, *http.Request)
 			return
 		}
 
+		b, err := io.ReadAll(r.Body)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("failed to read request body"))
+			return
+		}
+
 		var items []toolAPIs.PayloadNewItem
-		arrErr := json.NewDecoder(r.Body).Decode(&items)
+		arrErr := json.NewDecoder(bytes.NewBuffer(b)).Decode(&items)
 		if arrErr != nil {
 			// here we handle the case where a single item is sent.
 			// regrettably, the apple shortcuts app can't send arrays, so we have to handle single items here.
 			var item toolAPIs.PayloadNewItem
-			err := json.NewDecoder(r.Body).Decode(&item)
+			err := json.NewDecoder(bytes.NewBuffer(b)).Decode(&item)
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest)
 				w.Write([]byte("failed to parse JSON data as as item array or item object"))
+				w.Write([]byte(err.Error()))
+				return
 			}
 			items = []toolAPIs.PayloadNewItem{item}
 		}
@@ -73,9 +84,10 @@ func BuildItemCreateHandler(db *sql.DB) func(http.ResponseWriter, *http.Request)
 
 		ins := goquDB.Insert("webhookrss.items").Rows(records)
 
-		_, err := ins.Executor().Exec()
+		_, err = ins.Executor().Exec()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
 			return
 		}
 
