@@ -3,3 +3,19 @@ database:
   params:
     dbname: toolbelt_test
     sslmode: disable
+
+tools:
+  webhook-rss:
+    jobs:
+      deadman:
+        schedule: "0 0 * * * *"
+        endpoint: http://localhost:3000/webhook-rss/feeds/deadman/items
+      deadman-check:
+        schedule: "0 30 * * * *"
+        pushover_token: "xxx"
+        pushover_app: "xxx"
+      clean:
+        schedule: "0 45 * * * *"
+      clean-check:
+        schedule: "0 0 0 * * *"
+        endpoint: http://localhost:3000/webhook-rss/feeds/tool/items

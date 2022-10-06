@@ -4,11 +4,15 @@ import (
 	"bytes"
 	"database/sql"
 	"encoding/json"
-	toolAPIs "github.com/charlieegan3/tool-webhook-rss/pkg/apis"
-	"github.com/doug-martin/goqu/v9"
-	"github.com/gorilla/mux"
 	"io"
 	"net/http"
+	"strings"
+	"time"
+
+	"github.com/doug-martin/goqu/v9"
+	"github.com/gorilla/mux"
+
+	toolAPIs "github.com/charlieegan3/tool-webhook-rss/pkg/apis"
 )
 
 func BuildItemCreateHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
@@ -74,12 +78,27 @@ func BuildItemCreateHandler(db *sql.DB) func(http.ResponseWriter, *http.Request)
 				return
 			}
 
-			records = append(records, goqu.Record{
+			record := goqu.Record{
 				"feed":  feed,
 				"title": item.Title,
 				"body":  item.Body,
 				"url":   item.URL,
-			})
+			}
+
+			trimmedDate := strings.TrimSpace(item.Date)
+			if len(trimmedDate) == 10 {
+				date, err := time.Parse("2006-01-02", trimmedDate)
+				if err == nil {
+					record["created_at"] = date
+				}
+			} else if trimmedDate != "" {
+				date, err := time.Parse("2006-01-02T15:04:05-07:00", trimmedDate)
+				if err == nil {
+					record["created_at"] = date
+				}
+			}
+
+			records = append(records, record)
 		}
 
 		ins := goquDB.Insert("webhookrss.items").Rows(records)

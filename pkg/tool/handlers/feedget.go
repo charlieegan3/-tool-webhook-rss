@@ -44,7 +44,7 @@ func BuildFeedGetHandler(db *sql.DB) func(http.ResponseWriter, *http.Request) {
 		}
 
 		err := goquDB.From("webhookrss.items").
-			Where(goqu.C("feed").Eq(feed)).
+			Where(goqu.C("feed").Eq(feed), goqu.C("created_at").Lt("NOW()")).
 			Order(goqu.I("created_at").Desc()).
 			Limit(50).
 			ScanStructs(&items)

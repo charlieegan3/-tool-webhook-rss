@@ -2,15 +2,16 @@ package main
 
 import (
 	"context"
-	"github.com/charlieegan3/toolbelt/pkg/database"
-	"github.com/spf13/viper"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
 
-	webhookTool "github.com/charlieegan3/tool-webhook-rss/pkg/tool"
+	"github.com/charlieegan3/toolbelt/pkg/database"
 	"github.com/charlieegan3/toolbelt/pkg/tool"
+	"github.com/spf13/viper"
+
+	webhookTool "github.com/charlieegan3/tool-webhook-rss/pkg/tool"
 )
 
 // this is an example use of a Tool Belt showing the registration of an example Hello World tool
