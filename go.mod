@@ -6,7 +6,7 @@ go 1.19
 
 require (
 	github.com/Jeffail/gabs/v2 v2.6.1
-	github.com/charlieegan3/toolbelt v0.0.0-20221003074005-394a3439ad94
+	github.com/charlieegan3/toolbelt v0.0.0-20221012131106-c0a8a7937c75
 	github.com/doug-martin/goqu/v9 v9.18.0
 	github.com/gorilla/feeds v1.1.1
 	github.com/gorilla/mux v1.8.0

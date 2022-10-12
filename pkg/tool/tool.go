@@ -4,11 +4,13 @@ import (
 	"database/sql"
 	"embed"
 	"fmt"
+
 	"github.com/Jeffail/gabs/v2"
-	"github.com/charlieegan3/tool-webhook-rss/pkg/tool/handlers"
-	"github.com/charlieegan3/tool-webhook-rss/pkg/tool/jobs"
 	"github.com/charlieegan3/toolbelt/pkg/apis"
 	"github.com/gorilla/mux"
+
+	"github.com/charlieegan3/tool-webhook-rss/pkg/tool/handlers"
+	"github.com/charlieegan3/tool-webhook-rss/pkg/tool/jobs"
 )
 
 //go:embed migrations
@@ -146,4 +148,6 @@ func (d *WebhookRSS) Jobs() ([]apis.Job, error) {
 			Endpoint:         cleanCheckEndpoint,
 		},
 	}, nil
+}
+func (d *WebhookRSS) ExternalJobsFuncSet(f func(job apis.ExternalJob) error) {
 }
