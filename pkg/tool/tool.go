@@ -127,6 +127,23 @@ func (d *WebhookRSS) Jobs() ([]apis.Job, error) {
 		return j, fmt.Errorf("missing required config path: %s", path)
 	}
 
+	// load feed check config
+	path = "jobs.feed-check.schedule"
+	feedCheckSchedule, ok := d.config.Path(path).Data().(string)
+	if !ok {
+		return j, fmt.Errorf("missing required config path: %s", path)
+	}
+	path = "jobs.feed-check.endpoint"
+	feedCheckEndpoint, ok := d.config.Path(path).Data().(string)
+	if !ok {
+		return j, fmt.Errorf("missing required config path: %s", path)
+	}
+	path = "jobs.feed-check.feeds"
+	feedCheckData, ok := d.config.Path(path).Data().([]interface{})
+	if !ok {
+		return j, fmt.Errorf("missing required config path: %s", path)
+	}
+
 	return []apis.Job{
 		&jobs.DeadMan{
 			Endpoint:         deadmanEndpoint,
@@ -146,6 +163,12 @@ func (d *WebhookRSS) Jobs() ([]apis.Job, error) {
 			DB:               d.db,
 			ScheduleOverride: cleanCheckSchedule,
 			Endpoint:         cleanCheckEndpoint,
+		},
+		&jobs.FeedCheck{
+			DB:               d.db,
+			ScheduleOverride: feedCheckSchedule,
+			Endpoint:         feedCheckEndpoint,
+			Feeds:            feedCheckData,
 		},
 	}, nil
 }
