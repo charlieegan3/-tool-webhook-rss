@@ -33,7 +33,6 @@ func (c *FeedCheck) Run(ctx context.Context) error {
 	goquDB := goqu.New("postgres", c.DB)
 
 	go func() {
-		fmt.Println("here")
 		var rows []struct {
 			Feed string    `db:"feed"`
 			Age  time.Time `db:"created_at"`
