@@ -39,6 +39,7 @@ func (d *WebhookRSS) FeatureSet() apis.FeatureSet {
 func (d *WebhookRSS) HTTPPath() string {
 	return "webhook-rss"
 }
+func (d *WebhookRSS) HTTPHost() string { return "" }
 
 func (d *WebhookRSS) SetConfig(config map[string]any) error {
 	d.config = gabs.Wrap(config)
